@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pro01 Viewer Prompt Lab Runtime Notes</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", Arial, sans-serif;
+      line-height: 1.65;
+      color: #0f172a;
+      background: #f8fafc;
+    }
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 18px 60px;
+    }
+    section {
+      background: #fff;
+      border: 1px solid #dbe3ef;
+      border-radius: 8px;
+      padding: 18px;
+      margin: 14px 0;
+    }
+    h1, h2, h3 { line-height: 1.25; }
+    h1 { margin: 0 0 8px; font-size: 30px; }
+    h2 { margin-top: 0; font-size: 22px; }
+    h3 { margin-bottom: 6px; }
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    pre {
+      overflow: auto;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0;
+    }
+    th, td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #f1f5f9; }
+    .muted { color: #64748b; }
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 3px 9px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-weight: 700;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Pro01 Viewer Prompt Lab Runtime Notes</h1>
+    <p class="muted">Last updated: 2026-05-18</p>
+
+    <section>
+      <h2>定位</h2>
+      <p>Pro01 是 standalone / GitHub Pages friendly 的單檔 HTML runtime，不依賴 Pro02 OCR server。它不是單純發票 OCR 頁，而是泛用文件 AI ETL / HITL workbench。</p>
+      <pre>image / document / form
+-> template field schema
+-> prompt schema
+-> AI1 / AI2 proposal
+-> human reconciliation
+-> evidence package export</pre>
+    </section>
+
+    <section>
+      <h2>目前內建模板</h2>
+      <h3>台灣統一發票（三聯式）－目前欄位版</h3>
+      <p><code>tw_invoice_current_fields_v1</code></p>
+      <p>8 欄：invoice_number, date, seller_tax_id, buyer_tax_id, item_description, amount, tax_amount, total_amount。</p>
+
+      <h3>台灣統一發票（三聯式）－精簡版</h3>
+      <p><code>tw_invoice_compact_v1</code></p>
+      <p>5 欄：invoice_number, date, seller_tax_id, buyer_tax_id, total_amount。</p>
+
+      <h3>電子發票 A－完整版</h3>
+      <p><code>tw_einvoice_a_full_v1</code></p>
+      <p>包含店名/賣方、期別、發票號碼、開立時間、隨機碼、賣方統編、總金額、條碼/QR、機台資訊與 review_flags。</p>
+
+      <h3>電子發票 A－精簡版</h3>
+      <p><code>tw_einvoice_a_compact_v1</code></p>
+      <p>保留店名/賣方、期別、發票號碼、開立時間、隨機碼、賣方統編、總金額。</p>
+    </section>
+
+    <section>
+      <h2>Tab 設計</h2>
+      <p><span class="pill">Tab 1</span> 主工作區：選模板、載入圖片、執行 A1/A2、人工確認、匯出。</p>
+      <p><span class="pill">Tab 2</span> 模板範例：查看欄位 schema、核心 JSON、Prompt，並套用到主工作區。</p>
+      <p><span class="pill">Tab 3</span> 系統參數：目前先管理送出圖片策略。</p>
+    </section>
+
+    <section>
+      <h2>AI 執行</h2>
+      <ul>
+        <li>執行到 A1</li>
+        <li>執行到 A2</li>
+        <li>雙模型執行：依序跑 A1 <code>gemini-2.5-flash-lite</code>，再跑 A2 <code>gemini-2.5-flash</code></li>
+      </ul>
+      <p>按鈕狀態：黃色代表執行中，綠色代表成功，紅色代表失敗。</p>
+    </section>
+
+    <section>
+      <h2>Pass 欄位</h2>
+      <p>每個 reconciliation row 可以採用 AI1、採用 AI2，或 Pass 此欄位。Pass 不會讓資料默默消失，而是留下人工略過紀錄。</p>
+      <pre>{
+  "validation_status": "passed",
+  "pass_status": true,
+  "pass_note": "人工略過此欄位",
+  "confirmed_relation": "人工 Pass"
+}</pre>
+    </section>
+
+    <section>
+      <h2>送出圖片策略</h2>
+      <p>轉檔由瀏覽器 Canvas 在本機完成，不需要 server。預設是原檔。</p>
+      <table>
+        <thead>
+          <tr><th>策略</th><th>格式</th><th>尺寸規則</th><th>備註</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>original</code></td><td>原格式</td><td>不轉檔</td><td>evidence-first default</td></tr>
+          <tr><td><code>jpg_compressed</code></td><td>JPEG</td><td>長邊超過 1400 才縮小</td><td>小檔案、速度快</td></tr>
+          <tr><td><code>jpg_high</code></td><td>JPEG</td><td>長邊超過 2200 才縮小</td><td>照片型文件較適合</td></tr>
+          <tr><td><code>png_standard</code></td><td>PNG</td><td>長邊超過 1800 才縮小</td><td>推薦 OCR / AI vision</td></tr>
+          <tr><td><code>png_high</code></td><td>PNG</td><td>長邊超過 3000 才縮小</td><td>小字票據，檔案較大</td></tr>
+        </tbody>
+      </table>
+      <p>重要決策：不放大小圖。小圖放大不會創造真實細節，反而增加 token / 傳輸成本。</p>
+    </section>
+
+    <section>
+      <h2>圖片 Metadata</h2>
+      <p>runtime 會記錄 source image 與 actual sent image 的格式、大小、寬高、轉檔策略、是否 resize、scale、quality 等資訊。</p>
+      <pre>{
+  "source_image_meta": {
+    "name": "",
+    "type": "",
+    "size": 0,
+    "size_kb": 0,
+    "width": 0,
+    "height": 0
+  },
+  "last_send_image_meta": {
+    "name": "",
+    "type": "",
+    "size": 0,
+    "size_kb": 0,
+    "width": 0,
+    "height": 0,
+    "strategy": "",
+    "converted": true,
+    "resized": false,
+    "scale": 1
+  }
+}</pre>
+      <p>重要決策：本機 DB 與 JSON / Excel 匯出不保存圖片位元組，只保存圖片 metadata。這樣可以降低瀏覽器容量壓力，也方便之後做雲端上傳分析時避免把原始圖片一起送出。</p>
+    </section>
+
+    <section>
+      <h2>本機儲存閉環</h2>
+      <p>Pro01 的本機版應該不用 server 就能完成一個閉環：目前工作區 → 自動記憶到瀏覽器 IndexedDB → 匯出 JSON / Excel → 匯入 JSON → 後續做地端或雲端彙總分析。</p>
+      <p>使用者不需要一直按「儲存記憶」。A1/A2 更新、模板切換、欄位確認、人工修改、Pass 欄位、圖片策略調整，都應該由 runtime 自動記憶。</p>
+      <p>再次開啟頁面時，可載入最近一筆本機紀錄回工作區。不過因為不存圖片，所以只恢復文字 proposal、欄位、模型模式、圖片 metadata 與分析 context。</p>
+      <p>畫面上真正會調整專案記憶空間的管理動作只保留「清除 Pro01 記憶」。匯出 / 匯入是資料交換能力，不是日常記憶按鈕。</p>
+      <table>
+        <thead>
+          <tr><th>層次</th><th>用途</th><th>是否存圖片</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>localStorage</td><td>小型設定</td><td>否</td><td>API Key、圖片策略、A1/A2 模式、Prompt 記憶</td></tr>
+          <tr><td>IndexedDB</td><td>使用者暫存紀錄</td><td>否</td><td>保存 reconciliation payload、欄位、metadata、analysis seed</td></tr>
+          <tr><td>JSON 匯出</td><td>可攜備份 / 雲端分析</td><td>否</td><td>最適合程式讀取與批次分析</td></tr>
+          <tr><td>Excel 匯出</td><td>人工檢視 / 教學</td><td>否</td><td>以表格方式攤平紀錄</td></tr>
+          <tr><td>HTML 匯出</td><td>可讀 evidence package</td><td>機器 JSON 不存圖片</td><td>分析器應讀 script blocks，不應抓畫面排版</td></tr>
+        </tbody>
+      </table>
+      <p>清除專案記憶時，只清 Pro01 的 localStorage keys 與 IndexedDB records，不應清其他專案、瀏覽器快取或系統模型。</p>
+    </section>
+
+    <section>
+      <h2>Portable Analysis Package</h2>
+      <p>未來不論是地端掃描資料夾裡的 HTML/JSON，或雲端上傳幾個 evidence files 做分析，都應該讀取穩定的 machine-readable JSON blocks。</p>
+      <p>新的 canonical script block ids：</p>
+      <pre>pro01-package-manifest
+pro01-record
+pro01-analysis-seed</pre>
+      <p>舊版相容 blocks 可保留：</p>
+      <pre>falo-runtime-payload
+falo-confirmed-result
+falo-reconciliation-fields
+falo-accuracy-analysis-seed
+falo-audit-summary</pre>
+      <p><code>pro01-package-manifest</code> 用來快速判斷檔案是不是 Pro01 package；<code>pro01-record</code> 保存完整紀錄但不含 API Key、不含 base64 圖片；<code>pro01-analysis-seed</code> 保存 AI1 vs AI2 vs Human Confirmed 的正確率分析種子。</p>
+      <pre>{
+  "package_type": "falo_pro01_reconciliation_package",
+  "schema_version": "1.02",
+  "runtime": "pro01_viewer_prompt_lab",
+  "record_id": "pro01_...",
+  "contains_image_bytes": false
+}</pre>
+      <p>這樣地端與雲端可以共用同一套解析邏輯：</p>
+      <pre>local folder scanner:
+scan *.html / *.json -> extract pro01-* blocks -> aggregate
+
+cloud upload:
+upload selected *.html / *.json -> extract pro01-* blocks -> aggregate</pre>
+    </section>
+
+    <section>
+      <h2>Accuracy Analysis Seed</h2>
+      <p>開發模式先記錄詳細資料。正確率分析比較 AI1、AI2 與 Human Confirmed，其中 Human Confirmed 暫時視為 ground truth。</p>
+      <p>分析 JSON 會記錄模板、圖片策略、原圖/送出圖 metadata，以及 AI1 / AI2 的模式與模型。</p>
+      <pre>{
+  "analysis_context": {
+    "analysis_basis": "human_confirmed_as_ground_truth",
+    "template": {
+      "id": "tw_einvoice_a_full_v1",
+      "name": "電子發票 A－完整版"
+    },
+    "image_strategy": {
+      "mode": "png_standard",
+      "label": "一般 PNG（推薦）"
+    },
+    "models": {
+      "ai1": {
+        "source": "gemini_api",
+        "model": "gemini-2.5-flash-lite"
+      },
+      "ai2": {
+        "source": "gemini_api",
+        "model": "gemini-2.5-flash"
+      }
+    }
+  }
+}</pre>
+      <p>每個欄位也會記錄 value + source + model、是否與 confirmed 相符、AI1/AI2 是否一致、是否 pass。</p>
+      <p>匯出的 HTML 會包含 <code>falo-accuracy-analysis-seed</code> JSON script block，方便後續批次分析。</p>
+    </section>
+
+    <section>
+      <h2>後續方向</h2>
+      <ul>
+        <li>模板複製與客製化</li>
+        <li>欄位庫 Field Registry</li>
+        <li>關鍵字 / 智慧搜尋欄位</li>
+        <li>由欄位組合 Prompt</li>
+        <li>AI Mesh connector cards</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
