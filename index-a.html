@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FALO Viewer + Prompt Lab B v1.02</title>
+  <title>FALO Viewer + Prompt Lab v1.01</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -517,9 +517,9 @@
   </div>
   <div class="page">
     <section class="card">
-      <h1>Viewer Runtime B v1.02（Google Gemini 3 路線）</h1>
+      <h1>Viewer Runtime v1.01（圖片測試）</h1>
       <div class="result-block">
-        A 版維持原路徑不動；本 B 版加入 Google Gemini 3.1 Flash-Lite / 3.5 Flash 雙路線。單機 / GitHub 版仍提供兩種流程：1) Gemini API 直接由瀏覽器呼叫 Google；2) AI 瀏覽器或人工轉貼到 A1/A2。威力加強版才會啟用 AI Mesh，可透過插卡方式串接本地或網路上的 Ollama / PaddleOCR / OCR Node。
+        目前單機 / GitHub 版先提供兩種流程：1) Gemini API 直接由瀏覽器呼叫 Google；2) AI 瀏覽器或人工轉貼到 A1/A2。威力加強版才會啟用 AI Mesh，可透過插卡方式串接本地或網路上的 Ollama / PaddleOCR / OCR Node。
       </div>
       <div class="reconcile-panel">
         <div class="prompt-toolbar">
@@ -530,7 +530,7 @@
           </span>
         </div>
         <div id="runtimeCurrentPanel">
-          <div class="small">主畫面目前只啟用純前端能力：Gemini API 直接呼叫 Google、AI 瀏覽器/人工轉貼到 A1/A2。B 版預設雙模型：A1 = gemini-2.5-flash，A2 = gemini-3.1-flash-lite；強化模式：A1 = gemini-3.1-flash-lite，A2 = gemini-3.5-flash。</div>
+          <div class="small">主畫面目前只啟用純前端能力：Gemini API 直接呼叫 Google、AI 瀏覽器/人工轉貼到 A1/A2。下方操作不需要本地 server。</div>
           <div class="toolbar" style="margin-top: 8px;">
             <label for="mainTemplateSelect">主工作區模板</label>
             <select id="mainTemplateSelect"></select>
@@ -584,7 +584,6 @@
           <div class="toolbar" style="margin-top: 8px;">
             <label for="imageQualityModeSelect">送出圖片品質</label>
             <select id="imageQualityModeSelect">
-              <option value="webp_ocr_768">WebP 768 OCR（B版預設）</option>
               <option value="original">原檔</option>
               <option value="jpg_compressed">高壓縮 JPG</option>
               <option value="jpg_high">高品質 JPG</option>
@@ -593,8 +592,8 @@
             </select>
             <button id="imageQualitySaveBtn" class="btn-primary" type="button">儲存圖片品質設定</button>
           </div>
-          <div id="imageQualityDescription" class="result-block">B 版預設使用 WebP 768 OCR：瀏覽器本機 Canvas 等比例縮小到最大邊 768px，WebP quality 0.85。</div>
-          <div class="small" id="imageQualityStatus">尚未儲存，B 版預設使用 WebP 768 OCR。</div>
+          <div id="imageQualityDescription" class="result-block">預設使用原檔。</div>
+          <div class="small" id="imageQualityStatus">尚未儲存，預設使用原檔。</div>
           <div class="storage-grid">
             <div class="storage-card">
               <h3>資料交換（不保存圖片）</h3>
@@ -651,7 +650,7 @@
       <div class="result-block" id="regionLog">目前未有區域紀錄</div>
       <details class="reconcile-panel gemini-workspace" id="geminiApiWorkspace">
         <summary>Gemini API 工作區</summary>
-        <div class="small">需要直接呼叫 Gemini API 時再展開。B 版已加入 Google Gemini 3.1 Flash-Lite / 3.5 Flash；執行成功後會回填至下方 AI proposal。</div>
+        <div class="small">需要直接呼叫 Gemini API 時再展開。執行成功後才會回填至下方 AI1 Proposal。</div>
         <label for="geminiPromptInput">Prompt</label>
         <textarea id="geminiPromptInput" class="proposal-textarea">請只輸出純 JSON，不要 Markdown。請辨識發票/憑證/收據中的 invoice_number, date, seller_tax_id, buyer_tax_id, item_description, amount, tax_amount, total_amount。看不清楚請留空字串或 0。</textarea>
         <div class="small">
@@ -670,13 +669,12 @@
           <button id="geminiApiKeyClearBtn" type="button">清除 Key</button>
           <button id="ai1ProposalRunBtn" class="btn-primary" type="button">執行到 A1</button>
           <button id="ai2ProposalRunBtn" class="btn-primary" type="button">執行到 A2</button>
-          <button id="dualProposalRunBtn" class="btn-primary" type="button">預設雙模型</button>
-          <button id="enhancedDualProposalRunBtn" class="btn-primary" type="button">強化雙模型</button>
+          <button id="dualProposalRunBtn" class="btn-primary" type="button">雙模型執行</button>
           <span id="ai1ProposalRunStatus" class="small">尚未執行</span>
         </div>
       </details>
       <div class="reconcile-panel">
-        <h2>AI Proposal Reconciliation B v1.02</h2>
+        <h2>AI Proposal Reconciliation v1.01</h2>
         <div class="small">AI1 / AI2 一致時自動帶入；不一致時需人工採用或修正。</div>
         <div class="proposal-input-grid">
             <div class="proposal-input-card">
@@ -761,7 +759,7 @@
     </section>
 
     <section class="card">
-      <h2>Prompt Profile B v1.02</h2>
+      <h2>Prompt Profile v1.01</h2>
       <div class="prompt-toolbar">
         <select id="promptSelect" hidden>
           <option value="">載入中…</option>
@@ -910,7 +908,6 @@
     const ai1ProposalRunBtn = document.getElementById("ai1ProposalRunBtn");
     const ai2ProposalRunBtn = document.getElementById("ai2ProposalRunBtn");
     const dualProposalRunBtn = document.getElementById("dualProposalRunBtn");
-    const enhancedDualProposalRunBtn = document.getElementById("enhancedDualProposalRunBtn");
     const ai1ProposalRunStatus = document.getElementById("ai1ProposalRunStatus");
     const geminiPromptInput = document.getElementById("geminiPromptInput");
     const geminiSampleTextBtn = document.getElementById("geminiSampleTextBtn");
@@ -920,18 +917,18 @@
     const proposalFontDecBtn = document.getElementById("proposalFontDecBtn");
     const proposalFontIncBtn = document.getElementById("proposalFontIncBtn");
 
-    const PROMPT_MEMORY_KEY = "falo_pro01b_prompt_lab_prompt_memory_v1";
-    const PROMPT_DELETED_KEY = "falo_pro01b_prompt_lab_prompt_deleted_v1";
-    const RECONCILIATION_DRAFT_KEY = "falo_pro01b_reconciliation_draft_v1";
-    const RECONCILIATION_ROUTE_KEY = "falo_pro01b_reconciliation_route_v1";
-    const GEMINI_API_KEY_LOCAL_KEY = "falo_pro01b_gemini_api_key_v1";
-    const CONNECTOR_CONFIG_KEY = "falo_pro01b_connector_cards_config_v1";
-    const SYSTEM_PARAM_KEY = "falo_pro01b_system_params_v1";
-    const PRO01_DB_NAME = "falo_pro01b_viewer_prompt_lab_v1";
+    const PROMPT_MEMORY_KEY = "falo_prompt_lab_prompt_memory_v1";
+    const PROMPT_DELETED_KEY = "falo_prompt_lab_prompt_deleted_v1";
+    const RECONCILIATION_DRAFT_KEY = "falo_reconciliation_draft_v1";
+    const RECONCILIATION_ROUTE_KEY = "falo_reconciliation_route_v1";
+    const GEMINI_API_KEY_LOCAL_KEY = "falo_pro01_gemini_api_key_v1";
+    const CONNECTOR_CONFIG_KEY = "falo_pro01_connector_cards_config_v1";
+    const SYSTEM_PARAM_KEY = "falo_pro01_system_params_v1";
+    const PRO01_DB_NAME = "falo_pro01_viewer_prompt_lab_v1";
     const PRO01_DB_VERSION = 1;
     const PRO01_RECORD_STORE = "reconciliation_records";
-    const PRO01_PACKAGE_SCHEMA_VERSION = "1.02-b";
-    const PRO01_RUNTIME_ID = "pro01b_viewer_prompt_lab";
+    const PRO01_PACKAGE_SCHEMA_VERSION = "1.02";
+    const PRO01_RUNTIME_ID = "pro01_viewer_prompt_lab";
     const CUSTOM_PROMPT_PREFIX = "custom_prompt_";
     const PROMPT_PAGE_SIZE = 6;
     const PRO01_LOCAL_STORAGE_KEYS = [
@@ -944,12 +941,8 @@
       SYSTEM_PARAM_KEY,
     ];
     const AI1_GEMINI_MODELS = [
-      "gemini-2.5-flash",
-      "gemini-3.1-flash-lite",
-      "gemini-3.5-flash",
-      "gemini-3.1-pro",
-      "gemini-3-flash-preview",
       "gemini-2.5-flash-lite",
+      "gemini-2.5-flash",
       "gemini-2.5-pro",
     ];
     const GEMINI_TEXT_PROMPT = "請辨識裡面的所有文字";
@@ -1192,7 +1185,7 @@
       originalImageZoom: 1,
       proposalFontSize: 14,
       currentTemplateId: TEMPLATE_PROFILES[0].id,
-      imageQualityMode: "webp_ocr_768",
+      imageQualityMode: "original",
       currentRecordId: "",
       ai1ProposalRuntime: {
         source: "gemini_api",
@@ -1284,20 +1277,16 @@
 
     function imageQualityLabel(mode) {
       const labels = {
-        webp_ocr_768: "WebP 768 OCR（B版預設）",
         original: "原檔",
         jpg_compressed: "高壓縮 JPG",
         jpg_high: "高品質 JPG",
         png_standard: "一般 PNG（推薦）",
         png_high: "高品質 PNG",
       };
-      return labels[mode] || labels.webp_ocr_768;
+      return labels[mode] || labels.original;
     }
 
     function imageQualityDescriptionText(mode) {
-      if (mode === "webp_ocr_768") {
-        return "WebP 768 OCR（B版預設）：由瀏覽器 Canvas 在本機等比例轉成 WebP；原圖長邊超過 768px 才縮小，quality 0.85，不放大小圖。目標是降低 Gemini 圖片輸入 tile/token 成本，同時保留發票、收據、名片等文件的主要文字辨識可用度。";
-      }
       if (mode === "jpg_compressed") {
         return "高壓縮 JPG：由瀏覽器 Canvas 在本機轉成 JPEG；原圖長邊超過 1400px 才縮小，品質 0.6；檔案小、速度快，但文字邊緣可能有壓縮雜訊。";
       }
@@ -1310,7 +1299,7 @@
       if (mode === "png_high") {
         return "高品質 PNG：由瀏覽器 Canvas 在本機轉成較高解析 PNG；原圖長邊超過 3000px 才縮小，不放大小圖；較慢、檔案較大，適合小字、發票、收據、名片細節。";
       }
-      return "原檔：不轉檔，直接把使用者選取的原始圖片送出。此模式最忠於原始證據；若需要最低處理成本，建議使用 B 版預設 WebP 768 OCR。";
+      return "原檔：不轉檔，直接把使用者選取的原始圖片送出。此模式最忠於原始證據，也是目前預設值。";
     }
 
     function syncImageQualityUi() {
@@ -1323,30 +1312,25 @@
       try {
         const raw = window.localStorage.getItem(SYSTEM_PARAM_KEY);
         const parsed = raw ? JSON.parse(raw) : {};
-        if (parsed.schema_version && parsed.schema_version !== "pro01b_system_params_v2") {
-          state.imageQualityMode = "webp_ocr_768";
-          syncImageQualityUi();
-          return;
-        }
         const migratedMode = parsed.imageQualityMode === "ocr_png"
           ? "png_standard"
           : parsed.imageQualityMode === "ocr_high_png"
             ? "png_high"
             : parsed.imageQualityMode;
-        if (["webp_ocr_768", "original", "jpg_compressed", "jpg_high", "png_standard", "png_high"].includes(migratedMode)) {
+        if (["original", "jpg_compressed", "jpg_high", "png_standard", "png_high"].includes(migratedMode)) {
           state.imageQualityMode = migratedMode;
         }
       } catch {
-        state.imageQualityMode = "webp_ocr_768";
+        state.imageQualityMode = "original";
       }
       syncImageQualityUi();
     }
 
     function saveSystemParams() {
-      state.imageQualityMode = imageQualityModeSelect.value || "webp_ocr_768";
+      state.imageQualityMode = imageQualityModeSelect.value || "original";
       try {
         window.localStorage.setItem(SYSTEM_PARAM_KEY, JSON.stringify({
-          schema_version: "pro01b_system_params_v2",
+          schema_version: "pro01_system_params_v1",
           imageQualityMode: state.imageQualityMode,
           updated_at: new Date().toISOString(),
         }));
@@ -1530,13 +1514,12 @@
 
     function getImageConversionParams(mode) {
       const params = {
-        webp_ocr_768: { mimeType: "image/webp", extension: "webp", suffix: "webp-768", maxLongSide: 768, quality: 0.85, smoothing: "high" },
         jpg_compressed: { mimeType: "image/jpeg", extension: "jpg", suffix: "jpg-compressed", maxLongSide: 1400, quality: 0.6, smoothing: "medium" },
         jpg_high: { mimeType: "image/jpeg", extension: "jpg", suffix: "jpg-high", maxLongSide: 2200, quality: 0.9, smoothing: "high" },
         png_standard: { mimeType: "image/png", extension: "png", suffix: "png-ocr", maxLongSide: 1800, quality: undefined, smoothing: "medium" },
         png_high: { mimeType: "image/png", extension: "png", suffix: "png-high", maxLongSide: 3000, quality: undefined, smoothing: "high" },
       };
-      return params[mode] || params.webp_ocr_768;
+      return params[mode] || params.png_standard;
     }
 
     function buildImageMeta(file, width, height, extra = {}) {
@@ -1896,7 +1879,6 @@
       ai1ProposalRunBtn.disabled = disabled;
       ai2ProposalRunBtn.disabled = disabled;
       dualProposalRunBtn.disabled = disabled;
-      enhancedDualProposalRunBtn.disabled = disabled;
     }
 
     async function runGeminiProposal(targetSide = "ai1", options = {}) {
@@ -2016,43 +1998,20 @@
       }
     }
 
-    async function runDualGeminiProposal(mode = "default") {
-      const routes = {
-        default: {
-          button: dualProposalRunBtn,
-          label: "B 版預設雙模型",
-          runningLabel: "預設雙模型執行中",
-          successLabel: "預設雙模型完成",
-          errorLabel: "預設雙模型失敗",
-          ai1: "gemini-2.5-flash",
-          ai2: "gemini-3.1-flash-lite",
-        },
-        enhanced: {
-          button: enhancedDualProposalRunBtn,
-          label: "B 版強化雙模型",
-          runningLabel: "強化雙模型執行中",
-          successLabel: "強化雙模型完成",
-          errorLabel: "強化雙模型失敗",
-          ai1: "gemini-3.1-flash-lite",
-          ai2: "gemini-3.5-flash",
-        },
-      };
-      const route = routes[mode] || routes.default;
+    async function runDualGeminiProposal() {
       setRunButtonsDisabled(true);
       setRunButtonState(ai1ProposalRunBtn, null, "執行到 A1");
       setRunButtonState(ai2ProposalRunBtn, null, "執行到 A2");
-      setRunButtonState(dualProposalRunBtn, null, "預設雙模型");
-      setRunButtonState(enhancedDualProposalRunBtn, null, "強化雙模型");
-      setRunButtonState(route.button, "running", route.runningLabel);
-      ai1ProposalRunStatus.textContent = `${route.label}依序執行：A1 ${route.ai1} → A2 ${route.ai2}`;
+      setRunButtonState(dualProposalRunBtn, "running", "雙模型執行中");
+      ai1ProposalRunStatus.textContent = "雙模型依序執行：A1 lite → A2 flash";
       try {
-        await runGeminiProposal("ai1", { model: route.ai1, keepButtonsEnabled: true, throwOnError: true });
-        await runGeminiProposal("ai2", { model: route.ai2, keepButtonsEnabled: true, throwOnError: true });
-        ai1ProposalModelSelect.value = route.ai1;
-        setRunButtonState(route.button, "success", route.successLabel);
-        ai1ProposalRunStatus.textContent = `${route.label}已完成：A1 ${route.ai1} / A2 ${route.ai2}`;
+        await runGeminiProposal("ai1", { model: "gemini-2.5-flash-lite", keepButtonsEnabled: true, throwOnError: true });
+        await runGeminiProposal("ai2", { model: "gemini-2.5-flash", keepButtonsEnabled: true, throwOnError: true });
+        ai1ProposalModelSelect.value = "gemini-2.5-flash";
+        setRunButtonState(dualProposalRunBtn, "success", "雙模型完成");
+        ai1ProposalRunStatus.textContent = "雙模型已完成：A1 gemini-2.5-flash-lite / A2 gemini-2.5-flash";
       } catch (err) {
-        setRunButtonState(route.button, "error", route.errorLabel);
+        setRunButtonState(dualProposalRunBtn, "error", "雙模型失敗");
       } finally {
         setRunButtonsDisabled(false);
       }
@@ -3607,7 +3566,7 @@
         state.promptSearch = "";
         state.promptFilter = "all";
         state.promptPage = 1;
-        state.imageQualityMode = "webp_ocr_768";
+        state.imageQualityMode = "original";
         promptSearchInput.value = "";
         ai1ProposalApiKeyInput.value = "";
         loadSystemParams();
@@ -4642,7 +4601,7 @@
       updateImageLayout();
     }
 
-    function canvasToBlob(canvas, type = "image/png", quality) {
+    function canvasToBlob(canvas, type = "image/png") {
       return new Promise((resolve, reject) => {
         canvas.toBlob((blob) => {
           if (blob) {
@@ -4650,7 +4609,7 @@
           } else {
             reject(new Error("canvas toBlob failed"));
           }
-        }, type, quality);
+        }, type);
       });
     }
 
@@ -4991,8 +4950,7 @@
     });
     ai1ProposalRunBtn.addEventListener("click", () => runGeminiProposal("ai1"));
     ai2ProposalRunBtn.addEventListener("click", () => runGeminiProposal("ai2"));
-    dualProposalRunBtn.addEventListener("click", () => runDualGeminiProposal("default"));
-    enhancedDualProposalRunBtn.addEventListener("click", () => runDualGeminiProposal("enhanced"));
+    dualProposalRunBtn.addEventListener("click", runDualGeminiProposal);
     ai1CopyToAi2Btn.addEventListener("click", () => copyProposalSide("ai1", "ai2"));
     ai2CopyToAi1Btn.addEventListener("click", () => copyProposalSide("ai2", "ai1"));
     proposalFontDecBtn.addEventListener("click", () => setProposalFontSize(state.proposalFontSize - 1));

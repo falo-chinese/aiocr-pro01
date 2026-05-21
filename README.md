@@ -21,6 +21,13 @@ index.html
 
 No backend server is required.
 
+Version entry files:
+
+```text
+index.html   # current B version
+index-a.html # archived A version
+```
+
 ## Privacy Boundary
 
 This Pro01 edition is browser-native and local-first:
@@ -34,6 +41,7 @@ This Pro01 edition is browser-native and local-first:
 
 ```text
 index.html
+index-a.html
 docs/runtime-notes.md
 docs/runtime-notes.html
 downloads/pro01_viewer_prompt_lab_20260518_033128.zip
@@ -58,4 +66,3 @@ See:
 
 - [Runtime notes](docs/runtime-notes.md)
 - [Runtime notes HTML](docs/runtime-notes.html)
-
